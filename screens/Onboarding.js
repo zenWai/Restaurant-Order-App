@@ -1,15 +1,17 @@
 import React, {useContext, useRef, useState} from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image} from 'react-native';
-import PagerView from 'react-native-pager-view';
+import { View, StyleSheet, ImageBackground, Image} from 'react-native';
+import {Text} from "react-native-paper";
 import HeroSection from '../shared/HeroSection';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AuthContext} from "../shared/AuthContext";
+import {Dialog, Button, Portal, TextInput} from "react-native-paper";
 
 function Onboarding() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const viewPagerRef = useRef(null);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [visible, setVisible] = useState(false);
+    const showDialog = () => setVisible(true);
+    const hideDialog = () => setVisible(false);
 
     const { setIsAuthenticated } = useContext(AuthContext);
 
@@ -19,16 +21,13 @@ function Onboarding() {
                 await AsyncStorage.setItem('name', name);
                 await AsyncStorage.setItem('email', email);
                 setIsAuthenticated(true);  // update isAuthenticated in our context
+                hideDialog();
             } catch (error) {
                 console.error(error);
             }
         } else {
             alert("Please ensure name and email are not empty and email is valid!");
         }
-    };
-
-    const onPageSelected = (e) => {
-        setCurrentPage(e.nativeEvent.position);
     };
 
     return (
@@ -58,44 +57,53 @@ function Onboarding() {
             </View>
 
             <View style={styles.bottomContainer}>
-                <PagerView
-                    style={styles.pager}
-                    initialPage={0}
-                    onPageSelected={onPageSelected}
-                    ref={viewPagerRef}
+                <Text style={styles.text} variant="displaySmall">Feeling hungry?</Text>
+                <Button
+                    mode="contained"
+                    onPress={showDialog}
+                    buttonColor='#F4CE14' // set color
+                    contentStyle={{ flexDirection: "row-reverse", elevation: 5, height:60, width: 260}}
+                    icon={({size, color}) => (
+                        <Image
+                            source={require('../assets/delivery-man.png')}
+                            style={{width: 60, height: 60}}
+                        />
+                    )}
                 >
-                    <View key="1" style={styles.page}>
-                        <Text style={styles.pageText}>Are you hungry?</Text>
-                        <Button title="Yes!" onPress={() => viewPagerRef.current.setPage(1)} />
-                    </View>
+                    <Text style={{color:'black', fontWeight: 'bold'}} variant="titleLarge">Order Now</Text>
+                </Button>
 
-                    <View key="2" style={styles.page}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="First and Last Name"
-                            onChangeText={text => setName(text)}
-                        />
-                        <Button title="Next" onPress={() => viewPagerRef.current.setPage(2)} />
-                    </View>
-
-                    <View key="3" style={styles.page}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Email"
-                            onChangeText={text => setEmail(text)}
-                        />
-                        <Button title="Finish" onPress={saveInfo} />
-                    </View>
-                </PagerView>
-
-                <View style={styles.dotsContainer}>
-                    {[0, 1, 2].map((index) => (
-                        <View
-                            key={index}
-                            style={[styles.dot, currentPage === index ? styles.activeDot : null]}
-                        />
-                    ))}
-                </View>
+                <Portal>
+                    <Dialog visible={visible} onDismiss={hideDialog}>
+                        <Dialog.Title>Order Now</Dialog.Title>
+                        <Dialog.Content>
+                            <TextInput
+                                label="First and Last Name"
+                                value={name}
+                                onChangeText={setName}
+                                mode="flat"
+                                style={styles.input}
+                            />
+                            <TextInput
+                                label="Email"
+                                value={email}
+                                onChangeText={setEmail}
+                                mode="flat"
+                                style={styles.input}
+                            />
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button
+                                icon={() => <Image source={require('../assets/check-mark.png')} style={{width: 24, height: 24}} />}
+                                mode="contained"
+                                onPress={saveInfo}
+                                disabled={name.trim() === '' || email.trim() === '' || !email.includes('@')}
+                            >
+                                Choose your Food
+                            </Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
             </View>
         </View>
     );
@@ -104,7 +112,8 @@ function Onboarding() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F4CE14',
+        backgroundColor: 'white',
+        paddingHorizontal: 15,
     },
     topContainer: {
         flex: 1,
@@ -116,12 +125,32 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        marginTop: 10,
+        backgroundColor: 'white',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.23,
+        shadowRadius: 2.62,
+        elevation: 4,
     },
     bottomContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-
+        backgroundColor: '#495E57',
+        marginTop: 10,
+        marginBottom: 20,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.23,
+        shadowRadius: 2.62,
+        elevation: 4,
     },
     backgroundImage: {
         flex: 1,
@@ -141,59 +170,15 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     text: {
-        fontSize: 16,
         color: 'white',
-        textAlign: 'center',
-    },
-    pager: {
-        flex: 1,
-        width: '100%',
-    },
-    page: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-    },
-    pageText: {
-        fontSize: 20,
-        marginBottom: 20,
-        color: 'white',
-        fontWeight: 'bold',
-        textAlign: 'left',
-        textShadowColor: 'rgba(0, 0, 0, 0.25)',
-        textShadowOffset: { width: -1, height: 1 },
-        textShadowRadius: 5,
-        paddingLeft: 10,
+        textAlign: 'auto',
+        marginBottom: 40,
     },
     input: {
         width: '80%',
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 20,
-        paddingHorizontal: 10,
-        color: 'white',
-    },
-    dotsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginBottom: 20,
-    },
-    dot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        marginHorizontal: 5,
-        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    },
-    activeDot: {
-        backgroundColor: 'white',
-    },
-    cardImage: {
-        height: '70%',
-        aspectRatio: 1,
-        resizeMode: 'cover',
+        height: 50,
+        paddingHorizontal: 20,
+        marginTop: 10,
     },
 });
 

@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Onboarding from "./screens/Onboarding";
 import SplashScreen from "./shared/SplashScreen";
 import {AuthContext, AuthProvider} from "./shared/AuthContext";
+import {PaperProvider} from "react-native-paper";
 
 async function checkAuthenticationStatus(setIsAuthenticated) {
     try {
@@ -57,7 +58,9 @@ function App() {
     );
 }
 export default () => (
-    <AuthProvider>
-        <App />
-    </AuthProvider>
+    <PaperProvider>
+        <AuthProvider>
+            <App />
+        </AuthProvider>
+    </PaperProvider>
 );

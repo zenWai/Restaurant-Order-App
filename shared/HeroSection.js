@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import {RFValue} from "react-native-responsive-fontsize";
+import { View, StyleSheet, Image } from 'react-native';
+import { Text } from 'react-native-paper';
 
 function HeroSection({ title, subTitle, text, imageSrc }) {
     return (
         <View style={styles.container}>
             <View style={styles.textContainer}>
-                <Text style={styles.title}>{title}</Text>
-                <Text style={styles.subTitle}>{subTitle}</Text>
-                <Text style={styles.text}>{text}</Text>
+                <Text style={styles.title} variant="displaySmall">{title}</Text>
+                <Text style={styles.subTitle} variant="headlineMedium">{subTitle}</Text>
+                <Text style={styles.text} variant="bodyMedium">{text}</Text>
             </View>
             <Image source={imageSrc} style={styles.image} />
         </View>
@@ -34,14 +34,12 @@ const styles = StyleSheet.create({
         borderColor: '#000000',
     },
     title: {
-        fontSize: RFValue(45),
         fontWeight: 'bold',
         textAlign: 'left',
         color: '#F4CE14',
         paddingLeft: 10,
     },
     subTitle: {
-        fontSize: RFValue(34),
         fontWeight: 'bold',
         textAlign: 'left',
         color: 'rgba(255,255,255,0.88)',
@@ -51,7 +49,6 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
     },
     text: {
-        fontSize: RFValue(16),
         textAlign: 'left',
         color: 'rgba(255,255,255,0.88)',
         textShadowColor: 'rgba(0, 0, 0, 0.25)',

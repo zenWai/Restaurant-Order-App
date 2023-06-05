@@ -1,10 +1,9 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, {useState} from 'react';
 import { View, StyleSheet, ImageBackground, Image} from 'react-native';
-import {Text} from "react-native-paper";
 import HeroSection from '../shared/HeroSection';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthContext} from "../shared/AuthContext";
-import {Dialog, Button, Portal, TextInput} from "react-native-paper";
+import {Dialog, Button, Portal, TextInput, Text} from "react-native-paper";
+import { useNavigation } from '@react-navigation/native';
 
 function Onboarding() {
     const [name, setName] = useState('');
@@ -13,17 +12,32 @@ function Onboarding() {
     const showDialog = () => setVisible(true);
     const hideDialog = () => setVisible(false);
 
-    const { setIsAuthenticated } = useContext(AuthContext);
-
+    const navigation = useNavigation();
     const saveInfo = async () => {
+        const names = name.split(' ');
+
+        // Check if name and email are not empty, email is valid and at least two names are provided
         if(name.trim() !== '' && email.trim() !== '' && email.includes('@')) {
-            try {
-                await AsyncStorage.setItem('name', name);
-                await AsyncStorage.setItem('email', email);
-                setIsAuthenticated(true);  // update isAuthenticated in our context
-                hideDialog();
-            } catch (error) {
-                console.error(error);
+            if (names.length >= 2) {
+                let firstName = '';
+                let lastName = '';
+
+                if (names.length > 0) {
+                    lastName = names[names.length - 1];
+                    firstName = names.slice(0, names.length - 1).join(' ');
+                }
+
+                try {
+                    await AsyncStorage.setItem('firstName', firstName);
+                    await AsyncStorage.setItem('lastName', lastName);
+                    await AsyncStorage.setItem('email', email);
+                    hideDialog();
+                    navigation.navigate('Profile');
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                alert("Please provide at least two names (First Name and Last Name)!");
             }
         } else {
             alert("Please ensure name and email are not empty and email is valid!");

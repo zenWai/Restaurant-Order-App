@@ -1,49 +1,45 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Onboarding from "./screens/Onboarding";
 import SplashScreen from "./shared/SplashScreen";
-import {AuthContext, AuthProvider} from "./shared/AuthContext";
-import {PaperProvider} from "react-native-paper";
+import {DefaultTheme, Provider as PaperProvider} from "react-native-paper";
+import ProfilePage from "./screens/Profile";
+import { NativeBaseProvider } from 'native-base';
+import Home from "./screens/Home";
 
-async function checkAuthenticationStatus(setIsAuthenticated) {
+async function checkAuthenticationStatus() {
     try {
-        const name = await AsyncStorage.getItem('name');
+        const firstName = await AsyncStorage.getItem('firstName');
+        const lastName = await AsyncStorage.getItem('lastName');
         const email = await AsyncStorage.getItem('email');
-        if(name !== null && email !== null) {
-            setIsAuthenticated(true);
+        const profile = await AsyncStorage.getItem('profile');
+
+        if(firstName !== null && lastName !== null && email !== null) {
+            if(profile === "true") {
+                return "Home";
+            } else {
+                return "Profile";
+            }
+        } else {
+            return "Onboarding";
         }
     } catch (error) {
         console.error(error);
+        return "Onboarding";
     }
 }
 
-const AuthenticatedStack = createNativeStackNavigator();
-function AuthenticatedNavigator() {
-    return (
-        <AuthenticatedStack.Navigator>
-            <AuthenticatedStack.Screen name="Profile" component={Onboarding} />
-        </AuthenticatedStack.Navigator>
-    );
-}
-
-const NonAuthenticatedStack = createNativeStackNavigator();
-function NonAuthenticatedNavigator() {
-    return (
-        <NonAuthenticatedStack.Navigator>
-            <NonAuthenticatedStack.Screen name="Onboarding" component={Onboarding} />
-        </NonAuthenticatedStack.Navigator>
-    );
-}
-
+const Stack = createNativeStackNavigator();
 function App() {
     const [isLoading, setIsLoading] = useState(true);
-    const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+    const [initialRoute, setInitialRoute] = useState("Onboarding");
 
     useEffect(() => {
-        checkAuthenticationStatus(setIsAuthenticated).then(() => {
+        checkAuthenticationStatus().then(route => {
+            setInitialRoute(route);
             setIsLoading(false);
         });
     }, []);
@@ -53,14 +49,26 @@ function App() {
     }
     return (
         <NavigationContainer>
-            {isAuthenticated ? <AuthenticatedNavigator /> : <NonAuthenticatedNavigator />}
+            <Stack.Navigator initialRouteName={initialRoute}>
+                <Stack.Screen name="Onboarding" component={Onboarding} />
+                <Stack.Screen name="Profile" component={ProfilePage} />
+                <Stack.Screen name="Home" component={Home} />
+            </Stack.Navigator>
         </NavigationContainer>
     );
 }
+const theme = {
+    ...DefaultTheme,
+    colors: {
+        ...DefaultTheme.colors,
+        primary: '#495E57',
+        accent: '#f1c40f',
+    },
+};
 export default () => (
-    <PaperProvider>
-        <AuthProvider>
+    <PaperProvider theme={theme}>
+        <NativeBaseProvider>
             <App />
-        </AuthProvider>
+        </NativeBaseProvider>
     </PaperProvider>
 );

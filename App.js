@@ -37,17 +37,23 @@ const screenWidth = Dimensions.get('window').width;
 
 function BackArrow() {
     const navigation = useNavigation();
-    const canGoBack = navigation.canGoBack();
+    const previousRoute = useNavigationState(state => state.index > 0 ? state.routes[state.index - 1] : null);
 
-    return canGoBack ? (
+    // Don't show back button if the previous screen is 'Onboarding' or if there's no previous screen
+    //TODO: fix bug specific occasion not showing on Profile
+    if (!previousRoute || previousRoute.name === 'Onboarding') {
+        return <View style={{ width: screenWidth * 0.05 }} />;
+    }
+
+    return (
         <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image
                 source={require('./assets/left-arrow.png')}
-                style={{width: screenWidth * 0.05, height: screenWidth * 0.05}}
+                style={{ width: screenWidth * 0.05, height: screenWidth * 0.05 }}
                 resizeMode="contain"
             />
         </TouchableOpacity>
-    ) : <View style={{ width: screenWidth * 0.05 }} />;
+    );
 }
 
 function LogoHeader() {
@@ -112,16 +118,16 @@ function App() {
         });
     }, []);
 
-    const options = {
-        headerTitle,
-        headerRight,
-        headerLeft,
+    const options = ({ route }) => ({
+        headerTitle: headerTitle,
+        headerRight: route.name === 'Onboarding' ? () => null : headerRight, // if route is 'Onboarding', return null for headerRight
+        headerLeft: headerLeft,
         headerTitleAlign: 'center',
         headerStyle: {
             paddingHorizontal: 15,
         },
         headerBackVisible: false,
-    };
+    });
 
     if (isLoading) {
         return <SplashScreen />;

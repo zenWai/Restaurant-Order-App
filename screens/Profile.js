@@ -5,7 +5,7 @@ import {Box, Heading, VStack} from 'native-base';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PhoneInput from 'react-native-phone-input';
-import { useNavigation } from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 
 function ProfilePage() {
     const [firstName, setFirstName] = useState('');
@@ -142,6 +142,12 @@ function ProfilePage() {
                         <Box marginLeft="auto">
                             <Button onPress={async () => {
                                 await AsyncStorage.clear();
+                                navigation.dispatch(
+                                    CommonActions.reset({
+                                        index: 0,
+                                        routes: [{ name: 'Onboarding' }],
+                                    })
+                                );
                             }}>
                                 Log out
                             </Button>

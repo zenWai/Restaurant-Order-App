@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         flexDirection: 'row',
-        marginTop: 10,
     },
     textContainer: {
         flex: 1,
@@ -38,7 +37,7 @@ const styles = StyleSheet.create({
     },
     image: {
         width: 115,
-        height: 165,
+        height: 115,
         borderRadius: 7,
         borderWidth: 2,
         borderColor: '#000000',
@@ -62,6 +61,7 @@ const styles = StyleSheet.create({
         textShadowColor: 'rgba(0, 0, 0, 0.25)',
         textShadowOffset: { width: -1, height: 1 },
         textShadowRadius: 5,
+        marginTop: 10,
     },
 });
 

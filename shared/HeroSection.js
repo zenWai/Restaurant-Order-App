@@ -2,33 +2,43 @@ import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Text } from 'react-native-paper';
 
-function HeroSection({ title, subTitle, text, imageSrc }) {
+function HeroSection() {
     return (
         <View style={styles.container}>
-            <View style={styles.textContainer}>
-                <Text style={styles.title} variant="displaySmall">{title}</Text>
-                <Text style={styles.subTitle} variant="headlineMedium">{subTitle}</Text>
-                <Text style={styles.text} variant="bodyMedium">{text}</Text>
+            <Text style={styles.title} variant="displayLarge">
+                Little Lemon
+            </Text>
+            <View style={styles.contentContainer}>
+                <View style={styles.textContainer}>
+                    <Text style={styles.subTitle} variant="headlineMedium">
+                        Chicago
+                    </Text>
+                    <Text style={styles.text} variant="bodyLarge">
+                        We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.
+                    </Text>
+                </View>
+                <Image source={require('../assets/Hero_image.png')} style={styles.image} />
             </View>
-            <Image source={imageSrc} style={styles.image} />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: '#495E57',
+        padding: 10,
+    },
+    contentContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        marginTop: 10,
     },
     textContainer: {
         flex: 1,
+        marginRight: 20,
     },
     image: {
         width: 115,
-        height: 145,
-        marginRight: 20,
-        marginTop: 20,
+        height: 165,
         borderRadius: 7,
         borderWidth: 2,
         borderColor: '#000000',
@@ -37,7 +47,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'left',
         color: '#F4CE14',
-        paddingLeft: 10,
     },
     subTitle: {
         fontWeight: 'bold',
@@ -46,7 +55,6 @@ const styles = StyleSheet.create({
         textShadowColor: 'rgba(0, 0, 0, 0.25)',
         textShadowOffset: { width: -1, height: 1 },
         textShadowRadius: 5,
-        paddingLeft: 10,
     },
     text: {
         textAlign: 'left',
@@ -54,7 +62,6 @@ const styles = StyleSheet.create({
         textShadowColor: 'rgba(0, 0, 0, 0.25)',
         textShadowOffset: { width: -1, height: 1 },
         textShadowRadius: 5,
-        paddingLeft: 10,
     },
 });
 

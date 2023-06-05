@@ -46,14 +46,7 @@ function Onboarding() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.topContainer}>
-                <HeroSection
-                    title="Little Lemon"
-                    subTitle={"Chicago"}
-                    text="We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist."
-                    imageSrc={require('../assets/Hero_image.png')}
-                />
-            </View>
+                <HeroSection />
 
             <View style={styles.middleContainer}>
                 <ImageBackground
@@ -156,7 +149,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#495E57',
         marginTop: 10,
-        marginBottom: 20,
+        marginBottom: 10,
+        paddingBottom: 10,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,

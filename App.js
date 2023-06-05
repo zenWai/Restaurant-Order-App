@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {NavigationContainer, useNavigation, useNavigationState} from '@react-navigation/native';
+import { createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useEffect, useState} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Onboarding from "./screens/Onboarding";
 import SplashScreen from "./shared/SplashScreen";
-import {DefaultTheme, Provider as PaperProvider} from "react-native-paper";
+import {DefaultTheme, Provider as PaperProvider, Avatar} from "react-native-paper";
 import ProfilePage from "./screens/Profile";
 import { NativeBaseProvider } from 'native-base';
 import Home from "./screens/Home";
+import {View, Image, TouchableOpacity, Dimensions} from "react-native";
 
 async function checkAuthenticationStatus() {
     try {
@@ -32,17 +33,95 @@ async function checkAuthenticationStatus() {
     }
 }
 
+const screenWidth = Dimensions.get('window').width;
+
+function BackArrow() {
+    const navigation = useNavigation();
+    const canGoBack = navigation.canGoBack();
+
+    return canGoBack ? (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image
+                source={require('./assets/left-arrow.png')}
+                style={{width: screenWidth * 0.05, height: screenWidth * 0.05}}
+                resizeMode="contain"
+            />
+        </TouchableOpacity>
+    ) : <View style={{ width: screenWidth * 0.05 }} />;
+}
+
+function LogoHeader() {
+    const navigation = useNavigation();
+    const canGoBack = navigation.canGoBack();
+    const justifyContent = canGoBack ? 'flex-start' : 'center';
+
+    return (
+        <View style={{ flex: 1, justifyContent, alignItems: 'center' }}>
+            <Image source={require('./assets/Logo.png')} />
+        </View>
+    );
+}
+
+function CustomHeader({ imageUri, firstName, lastName }) {
+    const navigation = useNavigation();
+    return (
+        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+            <View style={{marginRight: 15}}>
+                {imageUri ? (
+                    <Avatar.Image size={44} source={{ uri: imageUri }} />
+                ) : (
+                    <Avatar.Text size={44} label={`${firstName[0]}${lastName[0]}`} />
+                )}
+            </View>
+        </TouchableOpacity>
+    );
+}
+
 const Stack = createNativeStackNavigator();
 function App() {
     const [isLoading, setIsLoading] = useState(true);
     const [initialRoute, setInitialRoute] = useState("Onboarding");
+    const [imageUri, setImageUri] = useState(null);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const headerLeft = () => <BackArrow />;
+    // headerRight is the Avatar component
+    const headerRight = () => <CustomHeader imageUri={imageUri} firstName={firstName} lastName={lastName} />;
+    // headerTitle is the Logo component
+    const headerTitle = () => <LogoHeader />;
 
     useEffect(() => {
+        AsyncStorage.getItem('ProfilePicture').then(image => {
+            if (image) {
+                setImageUri(image);
+            }
+        });
+        AsyncStorage.getItem('firstName').then(name => {
+            if (name) {
+                setFirstName(name);
+            }
+        });
+        AsyncStorage.getItem('lastName').then(name => {
+            if (name) {
+                setLastName(name);
+            }
+        });
         checkAuthenticationStatus().then(route => {
             setInitialRoute(route);
             setIsLoading(false);
         });
     }, []);
+
+    const options = {
+        headerTitle,
+        headerRight,
+        headerLeft,
+        headerTitleAlign: 'center',
+        headerStyle: {
+            paddingHorizontal: 15,
+        },
+        headerBackVisible: false,
+    };
 
     if (isLoading) {
         return <SplashScreen />;
@@ -50,9 +129,9 @@ function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName={initialRoute}>
-                <Stack.Screen name="Onboarding" component={Onboarding} />
-                <Stack.Screen name="Profile" component={ProfilePage} />
-                <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="Onboarding" component={Onboarding} options={options} />
+                <Stack.Screen name="Profile" component={ProfilePage} options={options} />
+                <Stack.Screen name="Home" component={Home} options={options} />
             </Stack.Navigator>
         </NavigationContainer>
     );

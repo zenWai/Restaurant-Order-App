@@ -1,6 +1,6 @@
 import {useEffect, useRef} from 'react';
 
-export function getSectionListData(data) {
+export function getCategoriesListData(data) {
     const groupedByCategory = data.reduce((acc, menuItem) => {
         if (!acc[menuItem.category]) {
             acc[menuItem.category] = [];
